@@ -1,5 +1,7 @@
 # codemirror-copilot
 
+[![npm version](https://badge.fury.io/js/codemirror-copilot.svg)](https://www.npmjs.com/package/codemirror-copilot)
+
 This CodeMirror extension lets you use GPT to autocomplete code in CodeMirror. It let's you call your API with current code (prefix and suffix from current cursor position) and let your API return the code to autocomplete.
 
 ![Screenshot](example.png)
@@ -90,6 +92,10 @@ The extension also implements local caching of predictions to avoid unnecessary 
 ### `clearLocalCache()`
 
 Clears the local cache of predictions.
+
+## Acknowledgements
+
+This code is based on [codemirror-extension-inline-suggestion](https://github.com/saminzadeh/codemirror-extension-inline-suggestion) by Shan Aminzadeh.
 
 ## License
 
