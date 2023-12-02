@@ -35,3 +35,10 @@ export const inlineCopilot = (
     delay,
   });
 };
+
+
+export const clearLocalCache = () => {
+  Object.keys(localSuggestionsCache).forEach((key) => {
+    delete localSuggestionsCache[key];
+  });
+}

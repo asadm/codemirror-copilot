@@ -77,6 +77,19 @@ export default async function handler(req, res) {
 
 ```
 
+## API
+
+### `inlineCopilot(apiCallingFn: (prefix: string, suffix: string) => Promise<string>, delay: number = 1000)`
+
+Provides extension for CodeMirror that renders the hints UI + Tab completion based on the prediction returned by the API.
+
+The `delay` parameter is the time in milliseconds to wait before calling the `apiCallingFn` after the user stops typing. Default value is `1000`.
+
+The extension also implements local caching of predictions to avoid unnecessary API calls.
+
+### `clearLocalCache()`
+
+Clears the local cache of predictions.
 
 ## License
 
