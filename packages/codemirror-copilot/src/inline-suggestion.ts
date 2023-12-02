@@ -81,18 +81,20 @@ export const fetchSuggestion = (fetchFn: InlineFetchFn) =>
           return;
         }
 
-        const isAutocompleted = update.transactions.some(t => t.isUserEvent("input.complete"));
-        if (isAutocompleted){
+        const isAutocompleted = update.transactions.some((t) =>
+          t.isUserEvent("input.complete")
+        );
+        if (isAutocompleted) {
           return;
         }
-      //   for (const tr of update.transactions) {
-      //     // Check the userEvent property of the transaction
-      //     if (tr.isUserEvent("input.complete")) {
-      //         console.log("Change was due to autocomplete");
-      //     } else {
-      //         console.log("Change was due to user input");
-      //     }
-      // }
+        //   for (const tr of update.transactions) {
+        //     // Check the userEvent property of the transaction
+        //     if (tr.isUserEvent("input.complete")) {
+        //         console.log("Change was due to autocomplete");
+        //     } else {
+        //         console.log("Change was due to user input");
+        //     }
+        // }
 
         console.log("CH", update);
         const result = await fetchFn(update.state);
@@ -118,19 +120,19 @@ const renderInlineSuggestionPlugin = ViewPlugin.fromClass(
         this.decorations = Decoration.none;
         return;
       }
-    //   console.log("SUGGESTION", suggestionText, update.transactions.map(t => t.effects.map(e=>e.is(InlineSuggestionEffect))));
-    //   for (const tr of update.transactions) {
-    //     // Check the userEvent property of the transaction
-    //     if (wasAuto){
-    //       wasAuto = false;
-    //       debugger;
-    //     }
-    //     if (tr.isUserEvent("input.complete")) {
-    //         console.log("Change was due to autocomplete");
-    //     } else {
-    //         console.log("Change was due to user input");
-    //     }
-    // }
+      //   console.log("SUGGESTION", suggestionText, update.transactions.map(t => t.effects.map(e=>e.is(InlineSuggestionEffect))));
+      //   for (const tr of update.transactions) {
+      //     // Check the userEvent property of the transaction
+      //     if (wasAuto){
+      //       wasAuto = false;
+      //       debugger;
+      //     }
+      //     if (tr.isUserEvent("input.complete")) {
+      //         console.log("Change was due to autocomplete");
+      //     } else {
+      //         console.log("Change was due to user input");
+      //     }
+      // }
       this.decorations = inlineSuggestionDecoration(
         update.view,
         suggestionText

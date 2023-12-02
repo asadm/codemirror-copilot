@@ -36,9 +36,8 @@ export const inlineCopilot = (
   });
 };
 
-
 export const clearLocalCache = () => {
   Object.keys(localSuggestionsCache).forEach((key) => {
     delete localSuggestionsCache[key];
   });
-}
+};
