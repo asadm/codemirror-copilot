@@ -1,9 +1,12 @@
 import { inlineSuggestion } from "./inline-suggestion";
 import type { EditorState } from "@codemirror/state";
 
-export type SuggestionRequestCallback = (prefix: string, suffix: string) => Promise<string>
+export type SuggestionRequestCallback = (
+  prefix: string,
+  suffix: string
+) => Promise<string>;
 
-let localSuggestionsCache: { [key: string]: string } = {};
+const localSuggestionsCache: { [key: string]: string } = {};
 
 export const inlineCopilot = (
   onSuggestionRequest: SuggestionRequestCallback,

@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "cd ../packages/codemirror-copilot/ && npm install",
     "dev": "next dev",
-    "build": "next build",
+    "build:copilot": "cd ../packages/codemirror-copilot/ && npm run build",
+    "build": "npm run build:copilot && next build",
     "start": "next start",
     "lint": "next lint"
   },

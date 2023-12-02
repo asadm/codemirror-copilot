@@ -19,10 +19,11 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "nodemon --watch 'src/**/*.ts' --ext 'ts' --exec \"npm run build && cp -R dist ../../website/\"",
+    "dev": "nodemon --watch 'src/**/*.ts' --ext 'ts' --exec \"npm run build && npm run copytowebsite\"",
     "lint": "eslint --ext .ts,.tsx src",
+    "copytowebsite": "cp -R dist ../../website/",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && npm run copytowebsite",
     "prepublish": "npm run lint && npm run build"
   },
   "devDependencies": {
