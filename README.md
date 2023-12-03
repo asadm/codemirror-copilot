@@ -6,6 +6,10 @@ This CodeMirror extension lets you use GPT to autocomplete code in CodeMirror. I
 
 ![Screenshot](example.png)
 
+## Demo
+
+https://copilot.asadmemon.com
+
 ## Installation
 
 ```bash
