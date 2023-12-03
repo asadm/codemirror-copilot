@@ -60,11 +60,34 @@ class InlineSuggestionWidget extends WidgetType {
     super();
     this.suggestion = suggestion;
   }
-  toDOM() {
+  toDOM(view: EditorView) {
     const div = document.createElement("span");
     div.style.opacity = "0.4";
     div.className = "cm-inline-suggestion";
     div.textContent = this.suggestion;
+    div.onclick = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const suggestionText = view.state.field(
+        InlineSuggestionState
+      )?.suggestion;
+
+      // If there is no suggestion, do nothing and let the default keymap handle it
+      if (!suggestionText) {
+        return false;
+      }
+
+      view.dispatch({
+        ...insertCompletionText(
+          view.state,
+          suggestionText,
+          view.state.selection.main.head,
+          view.state.selection.main.head
+        ),
+      });
+      return true;
+    };
     return div;
   }
 }

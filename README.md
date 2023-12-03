@@ -97,6 +97,25 @@ The extension also implements local caching of predictions to avoid unnecessary 
 
 Clears the local cache of predictions.
 
+
+## Local Development
+
+In one terminal, build the library itself by running:
+
+```bash
+cd packages/codemirror-copilot
+npm install
+npm run dev
+```
+
+In another terminal, run the demo website:
+
+```bash
+cd website
+npm install
+npm run dev
+```
+
 ## Acknowledgements
 
 This code is based on [codemirror-extension-inline-suggestion](https://github.com/saminzadeh/codemirror-extension-inline-suggestion) by Shan Aminzadeh.
