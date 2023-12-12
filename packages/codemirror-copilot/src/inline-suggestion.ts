@@ -119,7 +119,7 @@ export const fetchSuggestion = (fetchFn: InlineFetchFn) =>
         //     }
         // }
 
-        console.log("CH", update);
+        // console.log("CH", update);
         const result = await fetchFn(update.state);
         update.view.dispatch({
           effects: InlineSuggestionEffect.of({ text: result, doc: doc }),
