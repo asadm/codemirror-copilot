@@ -18,7 +18,9 @@ import {
 } from "@codemirror/state";
 import { debouncePromise } from "./lib/utils";
 
-// Current state of the autosuggestion
+/**
+ * Current state of the autosuggestion
+ */
 const InlineSuggestionState = StateField.define<{ suggestion: null | string }>({
   create() {
     return { suggestion: null };
@@ -41,7 +43,10 @@ const InlineSuggestionEffect = StateEffect.define<{
 }>();
 
 /**
- * Provides a suggestion for the next word
+ * Rendered by `renderInlineSuggestionPlugin`,
+ * this creates possibly multiple lines of ghostly
+ * text to show what would be inserted if you accept
+ * the AI suggestion.
  */
 function inlineSuggestionDecoration(view: EditorView, prefix: string) {
   const pos = view.state.selection.main.head;
@@ -92,8 +97,18 @@ class InlineSuggestionWidget extends WidgetType {
   }
 }
 
+/**
+ * The inner method to fetch suggestions: this is
+ * abstracted by `inlineCopilot`.
+ */
 type InlineFetchFn = (state: EditorState) => Promise<string>;
 
+/**
+ * Listens to document updates and calls `fetchFn`
+ * to fetch auto-suggestions. This relies on
+ * `InlineSuggestionState` also being installed
+ * in the editor’s extensions.
+ */
 export const fetchSuggestion = (fetchFn: InlineFetchFn) =>
   ViewPlugin.fromClass(
     class Plugin {
@@ -167,6 +182,10 @@ const renderInlineSuggestionPlugin = ViewPlugin.fromClass(
   }
 );
 
+/**
+ * Attaches a keybinding on `Tab` that accepts
+ * the suggestion if there is one.
+ */
 const inlineSuggestionKeymap = Prec.highest(
   keymap.of([
     {
@@ -225,11 +244,22 @@ function insertCompletionText(
   };
 }
 
+/**
+ * Options to configure the AI suggestion UI.
+ */
 type InlineSuggestionOptions = {
   fetchFn: (state: EditorState) => Promise<string>;
+  /**
+   * Delay after typing to query the API. A shorter
+   * delay will query more often, and cost more.
+   */
   delay?: number;
 };
 
+/**
+ * Configure the UI, state, and keymap to power
+ * auto suggestions.
+ */
 export function inlineSuggestion(options: InlineSuggestionOptions) {
   const { delay = 500 } = options;
   const fetchFn = debouncePromise(options.fetchFn, delay);
