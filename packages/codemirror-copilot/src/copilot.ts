@@ -14,15 +14,12 @@ export type SuggestionRequestCallback = (
 const localSuggestionsCache: { [key: string]: string } = {};
 
 /**
- * Configure the UI, state, and keymap to power
- * auto suggestions, with an abstracted
- * fetch method.
+ * Wraps a user-provided fetch method so that users
+ * don't have to interact directly with the EditorState
+ * object, and connects it to the local result cache.
  */
-export const inlineCopilot = (
-  onSuggestionRequest: SuggestionRequestCallback,
-  delay = 1000
-) => {
-  const fetchSuggestion = async (state: EditorState) => {
+function wrapUserFetcher(onSuggestionRequest: SuggestionRequestCallback) {
+  return async function fetchSuggestion(state: EditorState) {
     const { from, to } = state.selection.ranges[0];
     const text = state.doc.toString();
     const prefix = text.slice(0, to);
@@ -39,10 +36,22 @@ export const inlineCopilot = (
     localSuggestionsCache[key] = prediction;
     return prediction;
   };
+}
 
+/**
+ * Configure the UI, state, and keymap to power
+ * auto suggestions, with an abstracted
+ * fetch method.
+ */
+export const inlineCopilot = (
+  onSuggestionRequest: SuggestionRequestCallback,
+  delay = 1000,
+  acceptOnClick = true
+) => {
   return inlineSuggestion({
-    fetchFn: fetchSuggestion,
+    fetchFn: wrapUserFetcher(onSuggestionRequest),
     delay,
+    acceptOnClick,
   });
 };
 
