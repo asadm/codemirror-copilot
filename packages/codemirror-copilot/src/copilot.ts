@@ -1,6 +1,11 @@
 import { inlineSuggestion } from "./inline-suggestion";
 import type { EditorState } from "@codemirror/state";
 
+/**
+ * Should fetch autosuggestions from your AI
+ * of choice. If there are no suggestions,
+ * you should return an empty string.
+ */
 export type SuggestionRequestCallback = (
   prefix: string,
   suffix: string
@@ -8,6 +13,11 @@ export type SuggestionRequestCallback = (
 
 const localSuggestionsCache: { [key: string]: string } = {};
 
+/**
+ * Configure the UI, state, and keymap to power
+ * auto suggestions, with an abstracted
+ * fetch method.
+ */
 export const inlineCopilot = (
   onSuggestionRequest: SuggestionRequestCallback,
   delay = 1000
