@@ -14,7 +14,7 @@ export const inlineCopilot = (
 ) => {
   const fetchSuggestion = async (state: EditorState) => {
     const { from, to } = state.selection.ranges[0];
-    const text = (state.doc as any).text.join("\n");
+    const text = state.doc.toString();
     const prefix = text.slice(0, to);
     const suffix = text.slice(from);
 
