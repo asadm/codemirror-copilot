@@ -24,7 +24,8 @@
     "copytowebsite": "cp -R dist ../../website/",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
     "build": "tsc && vite build && npm run copytowebsite",
-    "prepublish": "npm run lint && npm run build"
+    "prepublish": "npm run lint && npm run build",
+    "test": "npm run lint"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.14.0",
