@@ -34,7 +34,7 @@ const InlineSuggestionState = StateField.define<{ suggestion: null | string }>({
   },
   update(__, tr) {
     const inlineSuggestion = tr.effects.find((e) =>
-      e.is(InlineSuggestionEffect)
+      e.is(InlineSuggestionEffect),
     );
     if (tr.state.doc)
       if (inlineSuggestion && tr.state.doc == inlineSuggestion.value.doc) {
@@ -119,7 +119,7 @@ class InlineSuggestionWidget extends WidgetType {
         view.state,
         suggestionText,
         view.state.selection.main.head,
-        view.state.selection.main.head
+        view.state.selection.main.head,
       ),
     });
     return true;
@@ -142,7 +142,7 @@ export const fetchSuggestion = ViewPlugin.fromClass(
       }
 
       const isAutocompleted = update.transactions.some((t) =>
-        t.isUserEvent("input.complete")
+        t.isUserEvent("input.complete"),
       );
       if (isAutocompleted) {
         return;
@@ -160,7 +160,7 @@ export const fetchSuggestion = ViewPlugin.fromClass(
       const config = update.view.state.facet(suggestionConfigFacet);
       if (!config.fetchFn) {
         console.error(
-          "Unexpected issue in codemirror-copilot: fetchFn was not configured"
+          "Unexpected issue in codemirror-copilot: fetchFn was not configured",
         );
         return;
       }
@@ -169,7 +169,7 @@ export const fetchSuggestion = ViewPlugin.fromClass(
         effects: InlineSuggestionEffect.of({ text: result, doc: doc }),
       });
     }
-  }
+  },
 );
 
 const renderInlineSuggestionPlugin = ViewPlugin.fromClass(
@@ -180,9 +180,8 @@ const renderInlineSuggestionPlugin = ViewPlugin.fromClass(
       this.decorations = Decoration.none;
     }
     update(update: ViewUpdate) {
-      const suggestionText = update.state.field(
-        InlineSuggestionState
-      )?.suggestion;
+      const suggestionText = update.state.field(InlineSuggestionState)
+        ?.suggestion;
       if (!suggestionText) {
         this.decorations = Decoration.none;
         return;
@@ -202,13 +201,13 @@ const renderInlineSuggestionPlugin = ViewPlugin.fromClass(
       // }
       this.decorations = inlineSuggestionDecoration(
         update.view,
-        suggestionText
+        suggestionText,
       );
     }
   },
   {
     decorations: (v) => v.decorations,
-  }
+  },
 );
 
 /**
@@ -220,9 +219,8 @@ const inlineSuggestionKeymap = Prec.highest(
     {
       key: "Tab",
       run: (view) => {
-        const suggestionText = view.state.field(
-          InlineSuggestionState
-        )?.suggestion;
+        const suggestionText = view.state.field(InlineSuggestionState)
+          ?.suggestion;
 
         // If there is no suggestion, do nothing and let the default keymap handle it
         if (!suggestionText) {
@@ -234,20 +232,20 @@ const inlineSuggestionKeymap = Prec.highest(
             view.state,
             suggestionText,
             view.state.selection.main.head,
-            view.state.selection.main.head
+            view.state.selection.main.head,
           ),
         });
         return true;
       },
     },
-  ])
+  ]),
 );
 
 function insertCompletionText(
   state: EditorState,
   text: string,
   from: number,
-  to: number
+  to: number,
 ): TransactionSpec {
   return {
     ...state.changeByRange((range) => {
