@@ -7,7 +7,7 @@
 export function debouncePromise<T extends (...args: any[]) => any>(
   fn: T,
   wait: number,
-  abortValue: any = undefined
+  abortValue: any = undefined,
 ) {
   let cancel = () => {
     // do nothing

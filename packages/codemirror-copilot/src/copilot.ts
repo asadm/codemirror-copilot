@@ -8,7 +8,7 @@ import type { EditorState } from "@codemirror/state";
  */
 export type SuggestionRequestCallback = (
   prefix: string,
-  suffix: string
+  suffix: string,
 ) => Promise<string>;
 
 const localSuggestionsCache: { [key: string]: string } = {};
@@ -46,7 +46,7 @@ function wrapUserFetcher(onSuggestionRequest: SuggestionRequestCallback) {
 export const inlineCopilot = (
   onSuggestionRequest: SuggestionRequestCallback,
   delay = 1000,
-  acceptOnClick = true
+  acceptOnClick = true,
 ) => {
   return inlineSuggestion({
     fetchFn: wrapUserFetcher(onSuggestionRequest),
