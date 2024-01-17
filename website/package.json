@@ -20,6 +20,7 @@
     "@uiw/react-codemirror": "^4.21.21",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "extract-json-from-string": "^1.0.1",
     "lucide-react": "^0.294.0",
     "next": "14.0.4",
     "openai": "^4.21.0",

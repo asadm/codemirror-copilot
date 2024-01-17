@@ -19,9 +19,12 @@ const DEFAULTCODE = `function add(num1, num2){
 
 function CodeEditor() {
   const [model, setModel] = useState("gpt-3.5-turbo-1106");
+  const [delay, setDelay] = useState(500);
   const [acceptOnClick, setAcceptOnClick] = useState(true);
   return (
     <>
+      <div className="flex items-center gap-2">
+        <label>Model</label>
       <Select
         value={model}
         onValueChange={(value) => {
@@ -36,6 +39,9 @@ function CodeEditor() {
           <SelectItem value="gpt-3.5-turbo-1106">
             GPT 3.5 Turbo <Badge variant="secondary">recommended</Badge>
           </SelectItem>
+          <SelectItem value="mixtral-8x7b">
+            Mixtral MoE 8x7B Instruct <Badge variant="secondary">best open source</Badge>
+          </SelectItem>
           <SelectItem value="codellama">
             Code Llama <Badge variant="secondary">buggy</Badge>
           </SelectItem>
@@ -44,6 +50,34 @@ function CodeEditor() {
           </SelectItem>
         </SelectContent>
       </Select>
+
+      <label className="ml-2">Delay</label>
+      <Select
+        value={delay}
+        onValueChange={(value) => {
+          setDelay(value);
+          clearLocalCache();
+        }}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Delay" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={500}>
+            500ms <Badge variant="secondary">recommended</Badge>
+          </SelectItem>
+          <SelectItem value={1000}>
+            1000ms <Badge variant="secondary">comfy</Badge>
+          </SelectItem>
+          <SelectItem value={100}>
+            100ms <Badge variant="destructive">psycho mode</Badge>
+          </SelectItem>
+          <SelectItem value={50}>
+            50ms <Badge variant="destructive">psycho's mom mode</Badge>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      </div>
       <CodeMirror
         style={{
           fontSize: "17px",
@@ -80,7 +114,7 @@ function CodeEditor() {
               const { prediction } = await res.json();
               return prediction;
             },
-            500,
+            delay,
             acceptOnClick,
           ),
         ]}

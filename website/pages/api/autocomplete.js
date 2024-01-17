@@ -1,8 +1,80 @@
 import OpenAI from "openai";
+import extract from "extract-json-from-string";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+async function completionMixtral(prefix, suffix, language) {
+  const response = await fetch(
+    `https://api.fireworks.ai/inference/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'text/event-stream',
+      'Authorization': `Bearer ${process.env.FIREWORKS_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "accounts/fireworks/models/mixtral-8x7b-instruct",
+      n: 1,
+      messages: [
+          {
+              role: "user",
+              content: "You are a " + (language || "") +" programmer that replaces <FILL_ME> part with the right code. Only output the code that replaces <FILL_ME> part. Do not add any explanation or markdown. Output JSON in this structure: {\"r\": \"...\"}\n```\n" + prefix + "<FILL_ME>" + suffix + "\n```",
+          },
+      ],
+      stop: [
+          "<|im_start|>",
+          "<|im_end|>",
+          "<|endoftext|>"
+      ],
+      top_p: 1,
+      top_k: 40,
+      presence_penalty: 0,
+      frequency_penalty: 0,
+      prompt_truncate_len: 1024,
+      context_length_exceeded_behavior: "truncate",
+      temperature: 0.9,
+      max_tokens: 50
+    }),
+  });
+
+  const wholeOutput = await response.json();
+  const outputJsonRaw = wholeOutput?.choices[0]?.message?.content;
+  try {
+    return extract(outputJsonRaw)[0].r;
+  }
+  catch (e) {
+    return "";
+  }
+}
+
+function completionLlama(prefix, suffix, language) {
+  const url = "https://api.fireworks.ai/inference/v1/completions";
+  const apiKey = process.env.FIREWORKS_API_KEY;
+  const headers = {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  };
+
+  const body = {
+    "model": "accounts/fireworks/models/llama-v2-7b",
+    "prompt": `You are a javascript programmer that replaces <FILL_ME> part with the right code. Only output the code that replaces <FILL_ME> part. Do not add any explanation or markdown. Output JSON in this structure: {r: ""}
+    \`\`\`
+    ${prefix}<FILL_ME>${suffix}
+    \`\`\``
+  };
+
+  return fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(body)
+  })
+  .then(response => response.json())
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
 
 async function completionLlama(prefix, suffix, language){
   try {
@@ -40,7 +112,7 @@ async function completionOpenAI(prefix, suffix, model="gpt-3.5-turbo-1106", lang
 
 export default async function handler(req, res) {
   const { prefix, suffix, model, language } = req.body;
-  const completionMethod = model == "codellama" ? completionLlama : completionOpenAI;
+  const completionMethod = model == "codellama" ? completionLlama : (model==="mixtral-8x7b"? completionMixtral : completionOpenAI);
   const prediction = await completionMethod(prefix, suffix, model, language);
   console.log(model, prediction)
   res.status(200).json({ prediction })
