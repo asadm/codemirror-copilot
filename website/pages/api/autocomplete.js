@@ -49,33 +49,6 @@ async function completionMixtral(prefix, suffix, language) {
   }
 }
 
-function completionLlama(prefix, suffix, language) {
-  const url = "https://api.fireworks.ai/inference/v1/completions";
-  const apiKey = process.env.FIREWORKS_API_KEY;
-  const headers = {
-    'Authorization': `Bearer ${apiKey}`,
-    'Content-Type': 'application/json'
-  };
-
-  const body = {
-    "model": "accounts/fireworks/models/llama-v2-7b",
-    "prompt": `You are a javascript programmer that replaces <FILL_ME> part with the right code. Only output the code that replaces <FILL_ME> part. Do not add any explanation or markdown. Output JSON in this structure: {r: ""}
-    \`\`\`
-    ${prefix}<FILL_ME>${suffix}
-    \`\`\``
-  };
-
-  return fetch(url, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(body)
-  })
-  .then(response => response.json())
-  .catch(error => {
-    console.error('Error:', error);
-  });
-}
-
 async function completionLlama(prefix, suffix, language){
   try {
     const response = await fetch(
