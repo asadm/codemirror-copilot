@@ -5,7 +5,56 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function completionMixtral(prefix, suffix, language) {
+function removeOverlapPrefixSuffix(text, prefix, suffix) {
+  // Remove overlapping part from the start (prefix)
+  let commonPrefixLength = 0;
+  for (let i = 0; i < prefix.length; i++) {
+      if (text.startsWith(prefix.slice(i))) {
+          commonPrefixLength = prefix.length - i;
+          break;
+      }
+  }
+  if (commonPrefixLength > 0) {
+      text = text.slice(commonPrefixLength);
+  }
+
+  // Remove overlapping part from the end (suffix)
+  let commonSuffixLength = 0;
+  for (let i = 0; i < suffix.length; i++) {
+      if (text.endsWith(suffix.substring(0, i + 1))) {
+          commonSuffixLength = i + 1;
+          break;
+      }
+  }
+  if (commonSuffixLength > 0) {
+      text = text.slice(0, -commonSuffixLength);
+  }
+
+  return text.trim();
+}
+
+async function completionMixtralWithCleanup(prefix, suffix, language){
+  const text = await completionMixtral(prefix, suffix, language);
+  return removeOverlapPrefixSuffix(text, prefix, suffix);
+}
+
+async function completionMixtral(prefix, suffix, language, previousOutput) {
+  let messages = [
+      {
+          role: "user",
+          content: "You are a " + (language || "") +" programmer that replaces <FILL_ME> part with the right code. Only output the code that replaces <FILL_ME> part. Do not add any explanation or markdown. ```\n" + prefix + "<FILL_ME>" + suffix + "\n```" + "\nOutput: JSON in this structure: {\"r\": \"...\"}\n",
+      },
+  ];
+  if (previousOutput) {
+    messages.push({
+      role: "assistant",
+      content: previousOutput,
+    });
+    messages.push({
+      role: "user",
+      content: "The previous output was not formatted correctly. Please try again. Output should be JSON in this structure: {\"r\": \"...\"}",
+    });
+  }
   const response = await fetch(
     `https://api.fireworks.ai/inference/v1/chat/completions`, {
     method: 'POST',
@@ -17,24 +66,19 @@ async function completionMixtral(prefix, suffix, language) {
     body: JSON.stringify({
       model: "accounts/fireworks/models/mixtral-8x7b-instruct",
       n: 1,
-      messages: [
-          {
-              role: "user",
-              content: "You are a " + (language || "") +" programmer that replaces <FILL_ME> part with the right code. Only output the code that replaces <FILL_ME> part. Do not add any explanation or markdown. Output JSON in this structure: {\"r\": \"...\"}\n```\n" + prefix + "<FILL_ME>" + suffix + "\n```",
-          },
-      ],
+      messages: messages,
       stop: [
           "<|im_start|>",
           "<|im_end|>",
           "<|endoftext|>"
       ],
       top_p: 1,
-      top_k: 40,
+      top_k: 30,
       presence_penalty: 0,
       frequency_penalty: 0,
       prompt_truncate_len: 1024,
       context_length_exceeded_behavior: "truncate",
-      temperature: 0.9,
+      temperature: 0.8,
       max_tokens: 50
     }),
   });
@@ -45,6 +89,10 @@ async function completionMixtral(prefix, suffix, language) {
     return extract(outputJsonRaw)[0].r;
   }
   catch (e) {
+    console.log(e, outputJsonRaw);
+    if (!previousOutput) {
+      return await completionMixtral(prefix, suffix, language, outputJsonRaw);
+    }
     return "";
   }
 }
@@ -85,7 +133,7 @@ async function completionOpenAI(prefix, suffix, model="gpt-3.5-turbo-1106", lang
 
 export default async function handler(req, res) {
   const { prefix, suffix, model, language } = req.body;
-  const completionMethod = model == "codellama" ? completionLlama : (model==="mixtral-8x7b"? completionMixtral : completionOpenAI);
+  const completionMethod = model == "codellama" ? completionLlama : (model==="mixtral-8x7b"? completionMixtralWithCleanup : completionOpenAI);
   const prediction = await completionMethod(prefix, suffix, model, language);
   console.log(model, prediction)
   res.status(200).json({ prediction })
