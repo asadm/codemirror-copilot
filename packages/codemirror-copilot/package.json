@@ -1,9 +1,17 @@
 {
   "name": "codemirror-copilot",
+  "description": "This CodeMirror extension lets you use GPT to autocomplete code in CodeMirror.",
+  "license": "MIT",
   "version": "0.0.6",
   "type": "module",
+  "keywords": [
+    "codemirror",
+    "extension",
+    "autocomplete"
+  ],
   "files": [
     "dist",
+    "example.png",
     "index.d.ts"
   ],
   "repository": {
@@ -22,8 +30,9 @@
     "dev": "nodemon --watch 'src/**/*.ts' --ext 'ts' --exec \"npm run build && npm run copytowebsite\"",
     "lint": "eslint --ext .ts,.tsx src",
     "copytowebsite": "cp -R dist ../../website/",
+    "copyreadme": "cp ../../README.md . && cp ../../example.png .",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
-    "build": "tsc && vite build && npm run copytowebsite",
+    "build": "tsc && vite build && npm run copyreadme && npm run copytowebsite",
     "prepublish": "npm run lint && npm run build",
     "test": "npm run lint"
   },
