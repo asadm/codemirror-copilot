@@ -2,7 +2,7 @@
   "name": "codemirror-copilot",
   "description": "This CodeMirror extension lets you use GPT to autocomplete code in CodeMirror.",
   "license": "MIT",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "type": "module",
   "keywords": [
     "codemirror",
