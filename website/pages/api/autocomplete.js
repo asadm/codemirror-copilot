@@ -4,6 +4,42 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const perplexityOpenai = new OpenAI({
+  apiKey: process.env.PERPLEXITY_KEY,
+  baseURL: "https://api.perplexity.ai",
+});
+
+function removeOverlapPrefix(text, prefix) {
+  // Remove overlapping part from the start (prefix)
+  let commonPrefixLength = 0;
+  for (let i = 0; i < prefix.length; i++) {
+      if (text.startsWith(prefix.slice(i))) {
+          commonPrefixLength = prefix.length - i;
+          break;
+      }
+  }
+  if (commonPrefixLength > 0 || prefix === "") {
+      text = text.slice(commonPrefixLength);
+  }
+  return text;
+}
+
+async function completionCodeLlama(prefix, suffix, model, language){
+  const chatCompletion = await perplexityOpenai.chat.completions.create({
+    messages: [
+      {
+        role: "system",
+        content: `You are a ${language?(language + " "):""}programmer that replaces <FILL_ME> part with the right code. Only output the code that replaces <FILL_ME> part. Do not add any explanation or markdown.`,
+      },
+      { role: "user", content: `${prefix}<FILL_ME>${suffix}` },
+    ],
+    model,
+  });
+
+
+  return removeOverlapPrefix(chatCompletion.choices[0].message.content, prefix);
+}
+
 async function completionLlama(prefix, suffix, language){
   try {
     const response = await fetch(
@@ -40,7 +76,7 @@ async function completionOpenAI(prefix, suffix, model="gpt-3.5-turbo-1106", lang
 
 export default async function handler(req, res) {
   const { prefix, suffix, model, language } = req.body;
-  const completionMethod = model == "codellama" ? completionLlama : completionOpenAI;
+  const completionMethod = model.startsWith("codellama") ? completionCodeLlama : completionOpenAI;
   const prediction = await completionMethod(prefix, suffix, model, language);
   console.log(model, prediction)
   res.status(200).json({ prediction })
